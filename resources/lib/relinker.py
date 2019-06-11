@@ -1,6 +1,12 @@
 import urllib
-import urllib2
-import urlparse
+try:
+  import urllib.request as urllib2
+except ImportError:
+    import urllib2
+try:
+  import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 
 class Relinker:
     # Firefox 52 on Android

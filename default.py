@@ -6,9 +6,16 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 import urllib
-import urlparse
+try:
+  import urllib.parse as urlparse
+except ImportError:
+    import urlparse
+try:
+    from urllib.parse import urlencode
+except:
+    from urllib import urlencode
 import datetime
-import StorageServer
+from resources.lib import StorageServer
 from resources.lib.tgr import TGR
 from resources.lib.search import Search
 from resources.lib.raiplay import RaiPlay
@@ -37,13 +44,13 @@ def parameters_string_to_dict(parameters):
     return paramDict
  
 def addDirectoryItem(parameters, li):
-    url = sys.argv[0] + '?' + urllib.urlencode(parameters)
+    url = sys.argv[0] + '?' + urlencode(parameters)
     return xbmcplugin.addDirectoryItem(handle=handle, url=url, 
         listitem=li, isFolder=True)
 
 def addLinkItem(parameters, li, url=""):
     if url == "":
-        url = sys.argv[0] + '?' + urllib.urlencode(parameters)
+        url = sys.argv[0] + '?' + urlencode(parameters)
     li.setProperty('IsPlayable', 'true')
     return xbmcplugin.addDirectoryItem(handle=handle, url=url, 
         listitem=li, isFolder=False)

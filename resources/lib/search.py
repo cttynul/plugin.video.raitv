@@ -1,7 +1,10 @@
 ﻿# -*- coding: utf-8 -*-
 import json
 import urllib
-import urllib2
+try:
+  import urllib.request as urllib2
+except ImportError:
+    import urllib2
 
 class Search:
     baseUrl = "http://www.rai.it"
