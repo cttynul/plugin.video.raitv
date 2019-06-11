@@ -78,10 +78,16 @@ def show_root_menu():
 
 def show_tg_root():
     search = Search()
-    for k, v in search.newsArchives.iteritems():
-        liStyle = xbmcgui.ListItem(k)
-        addDirectoryItem({"mode": "get_last_content_by_tag",
-            "tags": search.newsArchives[k]}, liStyle)    
+    try:
+        for k, v in search.newsArchives.iteritems():
+            liStyle = xbmcgui.ListItem(k)
+            addDirectoryItem({"mode": "get_last_content_by_tag",
+                "tags": search.newsArchives[k]}, liStyle)
+    except:
+        for k, v in search.newsArchives.items():
+            liStyle = xbmcgui.ListItem(k)
+            addDirectoryItem({"mode": "get_last_content_by_tag",
+                "tags": search.newsArchives[k]}, liStyle)
     liStyle = xbmcgui.ListItem("TGR",
         thumbnailImage="http://www.tgr.rai.it/dl/tgr/mhp/immagini/splash.png")
     addDirectoryItem({"mode": "tgr"}, liStyle)  
@@ -390,10 +396,16 @@ def search_ondemand_programmes():
     
 def show_news_providers():
     search = Search()
-    for k, v in search.newsProviders.iteritems():
-        liStyle = xbmcgui.ListItem(k)
-        addDirectoryItem({"mode": "get_last_content_by_tag",
-            "tags": search.newsProviders[k]}, liStyle)
+    try:
+        for k, v in search.newsProviders.iteritems():
+            liStyle = xbmcgui.ListItem(k)
+            addDirectoryItem({"mode": "get_last_content_by_tag",
+                "tags": search.newsProviders[k]}, liStyle)
+    except:
+        for k, v in search.newsProviders.items():
+            liStyle = xbmcgui.ListItem(k)
+            addDirectoryItem({"mode": "get_last_content_by_tag",
+                "tags": search.newsProviders[k]}, liStyle)
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     

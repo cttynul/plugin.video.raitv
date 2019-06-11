@@ -25,7 +25,8 @@ class Search:
         "Salute", "Satira", "Scienza", "Società", "Spettacolo", "Sport", "Storia", "Telefilm", "Tempo libero", "Viaggi"]
     
     def getLastContentByTag(self, tags="", numContents=16):
-        tags = urllib.quote(tags)
+        try: tags = urllib.quote(tags)
+        except: tags = urllib.parse.quote(tags)
         domain = "RaiTv"
         xsl = "rai_tv-statistiche-raiplay-json"
         
@@ -35,7 +36,8 @@ class Search:
         return response["list"]
     
     def getMostVisited(self, tags, days=7, numContents=16):
-        tags = urllib.quote(tags)
+        try: tags = urllib.quote(tags)
+        except: tags = urllib.parse.quote(tags)
         domain = "RaiTv"
         xsl = "rai_tv-statistiche-raiplay-json"
         
