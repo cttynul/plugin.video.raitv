@@ -7,6 +7,10 @@ try:
   import urllib.parse as urlparse
 except ImportError:
     import urlparse
+try:
+    from urllib.parse import urlencode
+except:
+    from urllib import urlencode
 
 class Relinker:
     # Firefox 52 on Android
@@ -42,14 +46,14 @@ class Relinker:
             del(qs['output'])
         qs['output'] = "20"
         
-        query = urllib.urlencode(qs, True)
+        query = urlencode(qs, True)
         url = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
                 
         response = urllib2.urlopen(url)
         mediaUrl = response.read().strip()
         
         # Workaround to normalize URL if the relinker doesn't
-        mediaUrl = urllib.quote(mediaUrl, safe="%/:=&?~#+!$,;'@()*[]")
-        
+        try: mediaUrl = urllib.quote(mediaUrl, safe="%/:=&?~#+!$,;'@()*[]")
+        except: mediaUrl = urllib.parse.quote(mediaUrl, safe="%/:=&?~#+!$,;'@()*[]")
         return mediaUrl
 
