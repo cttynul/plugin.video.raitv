@@ -4,6 +4,7 @@ try:
 except ImportError:
     import urllib2
 import json
+import re
 
 class RaiPlay:
     # Raiplay android app
@@ -18,6 +19,7 @@ class RaiPlay:
     localizeUrl = "http://mediapolisgs.rai.it/relinker/relinkerServlet.htm?cont=201342"
     menuUrl = "http://www.rai.it/dl/RaiPlay/2016/menu/PublishingBlock-20b274b1-23ae-414f-b3bf-4bdc13b86af2.html?homejson"
     palinsestoUrl = "https://www.raiplay.it/palinsesto/app/old/[nomeCanale]/[dd-mm-yyyy].json"
+    palinsestoUrlHtml = "https://www.raiplay.it/palinsesto/guidatv/lista/[idCanale]/[dd-mm-yyyy].html"
     AzTvShowPath = "/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json"
     
     def __init__(self):
@@ -43,8 +45,19 @@ class RaiPlay:
         url = url.replace("[nomeCanale]", channelTag)
         url = url.replace("[dd-mm-yyyy]", epgDate)
         response = json.load(urllib2.urlopen(url))
-        return response[channelName][0]["palinsesto"][0]["programmi"]
-        
+        try:
+          oRetVal = response[channelName][0]["palinsesto"][0]["programmi"]
+        except:
+          oRetVal = None
+        return oRetVal
+    
+    def getProgrammesHtml(self, channelName, epgDate):
+        channelTag = channelName.replace(" ", "-").lower()
+        url = self.palinsestoUrlHtml
+        url = url.replace("[idCanale]", channelTag)
+        url = url.replace("[dd-mm-yyyy]", epgDate)
+        return urllib2.urlopen(url).read()
+
     def getMainMenu(self):
         response = json.load(urllib2.urlopen(self.menuUrl))
         return response["menu"]
