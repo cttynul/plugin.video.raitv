@@ -22,6 +22,7 @@ from resources.lib.raiplay import RaiPlay
 from resources.lib.raiplayradio import RaiPlayRadio
 from resources.lib.relinker import Relinker
 import resources.lib.utils as utils
+import re
 
 # plugin constants
 __plugin__ = "plugin.video.raitv"
@@ -222,38 +223,79 @@ def show_replay_tv_epg(date, channelId):
     xbmc.log("Showing EPG for " + channelId + " on " + date)
     raiplay = RaiPlay()
     programmes = raiplay.getProgrammes(channelId, date)
-    
-    for programme in programmes:
-        if not programme:
-            continue
-    
-        startTime = programme["timePublished"]
-        title = programme["name"]
-        
-        if programme["images"]["landscape"] != "":
-            thumb = raiplay.getThumbnailUrl(programme["images"]["landscape"])
-        elif programme["isPartOf"] and programme["isPartOf"]["images"]["landscape"] != "":
-            thumb = raiplay.getThumbnailUrl(programme["isPartOf"]["images"]["landscape"])
-        else:
-            thumb = raiplay.noThumbUrl
-        
-        if programme["hasVideo"]:
-            videoUrl = programme["pathID"]
-        else:
-            videoUrl = None
-        
-        if videoUrl is None:
-            # programme is not available
-            liStyle = xbmcgui.ListItem(startTime + " [I]" + title + "[/I]",
-                thumbnailImage=thumb)
-            liStyle.setInfo("video", {})
-            addLinkItem({"mode": "nop"}, liStyle)
-        else:
-            liStyle = xbmcgui.ListItem(startTime + " " + title,
-                thumbnailImage=thumb)
-            liStyle.setInfo("video", {})
-            addLinkItem({"mode": "play",
-                "path_id": videoUrl}, liStyle)
+    if(programmes):
+      for programme in programmes:
+          if not programme:
+              continue
+      
+          startTime = programme["timePublished"]
+          title = programme["name"]
+          
+          if programme["images"]["landscape"] != "":
+              thumb = raiplay.getThumbnailUrl(programme["images"]["landscape"])
+          elif programme["isPartOf"] and programme["isPartOf"]["images"]["landscape"] != "":
+              thumb = raiplay.getThumbnailUrl(programme["isPartOf"]["images"]["landscape"])
+          else:
+              thumb = raiplay.noThumbUrl
+          
+          if programme["hasVideo"]:
+              videoUrl = programme["pathID"]
+          else:
+              videoUrl = None
+          
+          if videoUrl is None:
+              # programme is not available
+              liStyle = xbmcgui.ListItem(startTime + " [I]" + title + "[/I]",
+                  thumbnailImage=thumb)
+              liStyle.setInfo("video", {})
+              addLinkItem({"mode": "nop"}, liStyle)
+          else:
+              liStyle = xbmcgui.ListItem(startTime + " " + title,
+                  thumbnailImage=thumb)
+              liStyle.setInfo("video", {})
+              addLinkItem({"mode": "play",
+                  "path_id": videoUrl}, liStyle)
+    else:
+      response = raiplay.getProgrammesHtml(channelId, date)
+      programmes = re.findall('(<li.*?</li>)', response)
+      for i in programmes:
+          icon = re.findall('''data-img=['"]([^'^"]+?)['"]''', i)
+          if icon:
+              icon = raiplay.getUrl(icon[0])
+          else:
+              icon =''
+          
+          title = re.findall("<p class=\"info\">([^<]+?)</p>", i)
+          if title:
+              title = title[0]
+          else:
+              title = ''
+  
+          startTime = re.findall("<p class=\"time\">([^<]+?)</p>", i)
+          if startTime:
+              title = startTime[0] + " " + title
+  
+          desc = re.findall("<p class=\"descProgram\">([^<]+?)</p>", i, re.S)
+          if desc:
+              desc= desc[0]
+          else:
+              desc=""
+          
+          videoUrl = re.findall('''data-href=['"]([^'^"]+?)['"]''', i)
+  
+          if not videoUrl:
+              # programme is not available
+              liStyle = xbmcgui.ListItem(" [I]" + title + "[/I]", thumbnailImage = icon)
+              liStyle.setInfo("video", {})
+              addLinkItem({"mode": "nop"}, liStyle)
+          else:
+              videoUrl = videoUrl[0]
+              if not videoUrl.endswith('json'):
+                  videoUrl = videoUrl + "?json"
+  
+              liStyle = xbmcgui.ListItem(title, thumbnailImage = icon )
+              liStyle.setInfo("video", {})
+              addLinkItem({"mode": "play", "path_id": videoUrl}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_replay_radio_epg(date, channelId):
