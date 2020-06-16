@@ -92,6 +92,7 @@ class RaiPlay:
         return response["video"]
     
     def getUrl(self, pathId):
+        pathId = pathId[:-9] + pathId[-9:].replace("html?json", "json")
         pathId = pathId.replace(" ", "%20")
         if pathId[0:2] == "//":
             url = "http:" + pathId

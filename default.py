@@ -141,7 +141,7 @@ def play(url, pathId="", srt=[]):
         else:
             raiplay = RaiPlay()
             metadata = raiplay.getVideoMetadata(pathId)
-            url = metadata["contentUrl"]
+            url = metadata["content_url"]
             srtUrl = metadata["subtitles"]
             
         if srtUrl != "":
